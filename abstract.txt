@@ -1,5 +1,8 @@
+Bloom, A Mental Wellness App
+
 Bloom is a mobile application inspired by the CBT model, where users log affirmations as "Sprouts" that will grow into plants within their mind-garden. Our goal is to allow users to visualize the usually invisible progress of inner work as they identify negative cognitive patterns and practice affirmations in order to restructure them.
 
 Users will identify negative beliefs they want to modify and create a "Sprout", a little plant monster that contains the original belief and a list of affirmations that reframe it. By clicking on a Sprout from the home page garden, users can practice their affirmations, and through consistency, Sprouts eventually "take root" and become permanent fixtures in the garden interface.
+
 
 The current scope of this project includes managing user state, Sprout objects and their affirmation lists, and a simple garden homepage, built with React Native / Expo and using Jest for testing. Future development will add incentives for daily check-ins, different Sprout types, full CBT methodologies, journaling, and other features to support a more robust mental wellness tool.
