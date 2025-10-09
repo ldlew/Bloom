@@ -9,6 +9,9 @@ dist/
 web-build/
 expo-env.d.ts
 
+# Expo shared settings
+.expo-shared/
+
 # Native
 .kotlin/
 *.orig.*
@@ -26,12 +29,16 @@ npm-debug.*
 yarn-debug.*
 yarn-error.*
 
+# General log files
+*.log
+
 # macOS
 .DS_Store
 *.pem
 
 # local env files
 .env*.local
+.env
 
 # typescript
 *.tsbuildinfo
@@ -39,3 +46,6 @@ yarn-error.*
 # generated native folders
 /ios
 /android
+
+# Test coverage
+coverage/

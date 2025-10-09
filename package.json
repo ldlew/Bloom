@@ -2,21 +2,39 @@
   "name": "client",
   "version": "1.0.0",
   "main": "index.ts",
+  "private": true,
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "test": "jest --watchAll",
+    "lint": "expo lint",
+    "docker:up": "docker compose up --build",
+    "docker:down": "docker compose down",
+    "docker:lint": "docker compose run --rm app npm run lint",
+    "docker:test": "docker compose run --rm app npm run test"
   },
   "dependencies": {
     "expo": "~54.0.12",
+    "expo-sqlite": "~16.0.8",
     "expo-status-bar": "~3.0.8",
-    "react": "19.1.0",
-    "react-native": "0.81.4"
+  "react": "19.1.0",
+  "react-native": "0.81.4",
+  "react-test-renderer": "19.1.0",
+    "zustand": "^5.0.8"
   },
   "devDependencies": {
-    "@types/react": "~19.1.0",
+    "@testing-library/react-native": "^13.3.3",
+    "@types/jest": "^30.0.0",
+  "@types/react": "~19.1.10",
+    "eslint": "^9.37.0",
+    "eslint-config-expo": "^10.0.0",
+    "jest": "~29.7.0",
+    "jest-expo": "~54.0.12",
     "typescript": "~5.9.2"
   },
-  "private": true
+  "jest": {
+    "preset": "jest-expo"
+  }
 }
