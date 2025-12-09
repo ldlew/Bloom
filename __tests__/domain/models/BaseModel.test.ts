@@ -74,7 +74,9 @@ describe('BaseModel', () => {
         it('should always transition to PENDING on modification', () => {
             fc.assert(
                 fc.property(
-                    fc.date({ min: new Date('2020-01-01'), max: new Date('2100-01-01') }), 
+                    // FIX: Filter out Invalid Dates (NaN) to prevent equality errors
+                    fc.date({ min: new Date('2020-01-01'), max: new Date('2100-01-01') })
+                      .filter(d => !isNaN(d.getTime())), 
                     fc.constantFrom('synced', 'pending', 'unsynced'),
                     (randomDate, initialStatus) => {
                         const subject = new TestImplementation({
@@ -99,7 +101,8 @@ describe('BaseModel', () => {
         it('should always transition to SYNCED on sync confirmation', () => {
             fc.assert(
                 fc.property(
-                    fc.date(),
+                    // FIX: Filter out Invalid Dates here as well
+                    fc.date().filter(d => !isNaN(d.getTime())),
                     (serverDate) => {
                         const subject = new TestImplementation(props);
 

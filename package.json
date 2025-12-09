@@ -16,7 +16,8 @@
     "docker:up": "docker compose up --build",
     "docker:down": "docker compose down",
     "docker:lint": "docker compose run --rm app npm run lint",
-    "docker:test": "docker compose run --rm app npm run test"
+    "docker:test": "docker compose run --rm app npm run test",
+    "type-check": "tsc --noEmit"
   },
   "dependencies": {
     "@clerk/clerk-expo": "^2.19.1",

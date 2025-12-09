@@ -46,6 +46,12 @@ export default [
       'react-hooks/exhaustive-deps': 'warn',
       'react/jsx-boolean-value': ['error', 'never'],
     },
+    languageOptions: {
+  parserOptions: {
+    project: './tsconfig.json', // This connects ESLint to your types
+    tsconfigRootDir: import.meta.dirname,
+  },
+},
   },
 
   {
