@@ -7,12 +7,12 @@ import { SproutAvatar } from '../components/sprites/SproutAvatar';
 export const LoginScreen = () => {
     const login = useAppStore(state => state.login);
     const loadSprouts = useAppStore(state => state.loadSprouts);
-  
+ 
     const handleLogin = async () => {
         login('mock-user-id');
         await loadSprouts();
     };
-  
+ 
     return (
         <SafeAreaView style={styles.container} edges={['top']}>
             <View style={styles.content}>
@@ -26,11 +26,19 @@ export const LoginScreen = () => {
                 </View>
                 
                 <View style={styles.buttonContainer}>
-                    <TouchableOpacity style={styles.button} onPress={handleLogin} activeOpacity={0.8}>
+                    <TouchableOpacity 
+                        style={styles.button} 
+                        onPress={handleLogin} 
+                        activeOpacity={0.8}
+                    >
                         <Text style={styles.buttonText}>Sign in with Google</Text>
                     </TouchableOpacity>
                     
-                    <TouchableOpacity style={styles.secondaryButton} onPress={handleLogin} activeOpacity={0.6}>
+                    <TouchableOpacity 
+                        style={styles.secondaryButton} 
+                        onPress={handleLogin} 
+                        activeOpacity={0.6}
+                    >
                         <Text style={styles.secondaryButtonText}>Continue as Guest</Text>
                     </TouchableOpacity>
                 </View>

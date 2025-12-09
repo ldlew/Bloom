@@ -36,7 +36,7 @@ interface HatProps {
     size: number;
 }
 
-export const HatLeaves = ({ color, size }: HatProps) => (
+export const HatLeaves = ({ color: _color, size }: HatProps) => (
     <Svg width={size * 0.5} height={size * 0.4} viewBox="0 0 50 40">
         <Path 
             d="M25 35 Q15 20 25 5 Q35 20 25 35" 
@@ -49,7 +49,7 @@ export const HatLeaves = ({ color, size }: HatProps) => (
     </Svg>
 );
 
-export const HatFlower = ({ color, size }: HatProps) => (
+export const HatFlower = ({ color: _color, size }: HatProps) => (
     <Svg width={size * 0.4} height={size * 0.4} viewBox="0 0 40 40">
         <Circle cx="20" cy="10" r="8" fill="#FF9800" />
         <Circle cx="10" cy="18" r="8" fill="#FF9800" />
@@ -60,7 +60,7 @@ export const HatFlower = ({ color, size }: HatProps) => (
     </Svg>
 );
 
-export const HatBow = ({ color, size }: HatProps) => (
+export const HatBow = ({ color: _color, size }: HatProps) => (
     <Svg width={size * 0.5} height={size * 0.3} viewBox="0 0 50 30">
         <Path 
             d="M25 15 Q10 5 5 15 Q10 25 25 15" 
@@ -74,7 +74,7 @@ export const HatBow = ({ color, size }: HatProps) => (
     </Svg>
 );
 
-export const HatNone = ({ color, size }: HatProps) => null;
+export const HatNone = ({ color: _color, size: _size }: HatProps) => null;
 
 // Eyes component
 interface EyesProps {
@@ -84,7 +84,7 @@ interface EyesProps {
 export const Eyes = ({ size }: EyesProps) => {
     const eyeRadius = size * 0.12;
     const pupilRadius = size * 0.06;
-    const spacing = size * 0.15;
+    const _spacing = size * 0.15;
     
     return (
         <Svg width={size} height={size * 0.4} viewBox="0 0 100 40">

@@ -10,20 +10,22 @@ import { FAB } from '../components/buttons/FAB';
 import { BackButton } from '../components/buttons/BackButton';
 import { useAppStore } from '../stores/useAppStore';
 
-type NavigationProp = NativeStackNavigationProp<RootStackParamList, 'SproutList'>;
+type NavigationProp = 
+    NativeStackNavigationProp<RootStackParamList, 'SproutList'>;
 
 export const SproutListScreen = () => {
     const navigation = useNavigation<NavigationProp>();
-    const { sprouts, createSprout, deleteSprout, selectSprout, logout, loadSprouts } = useAppStore();
+    const { sprouts, createSprout, deleteSprout, 
+        selectSprout, logout, loadSprouts } = useAppStore();
 
     useEffect(() => {
         loadSprouts();
-    }, []);
+    }, [loadSprouts]);
 
     const handleAddSprout = async () => {
         try {
             await createSprout();
-        } catch (error) {
+        } catch (_error) {
             Alert.alert('Error', 'Failed to create sprout');
         }
     };

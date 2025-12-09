@@ -68,6 +68,7 @@ StyleSheet.configure({
     },
 });
 
+// This is needed, linting hates it, I haven't found a better solution.
 declare module 'react-native-unistyles' {
     export interface UnistylesBreakpoints extends AppBreakpoints {}
     export interface UnistylesThemes {

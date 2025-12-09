@@ -49,7 +49,7 @@ export const ReframesListScreen = () => {
             setModalVisible(false);
             setReframeText('');
             setEditingReframe(null);
-        } catch (error) {
+        } catch (_error) { // FIX 1: 'error' changed to '_error'
             Alert.alert('Error', 'Failed to save reframe');
         }
     };
@@ -66,7 +66,7 @@ export const ReframesListScreen = () => {
                     onPress: async () => {
                         try {
                             await removeAffirmation(reframeId);
-                        } catch (error) {
+                        } catch (_error) { // FIX 2: 'error' changed to '_error'
                             Alert.alert('Error', 'Failed to delete reframe');
                         }
                     },

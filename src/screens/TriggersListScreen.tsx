@@ -51,7 +51,7 @@ export const TriggersListScreen = () => {
             setModalVisible(false);
             setTriggerText('');
             setEditingTrigger(null);
-        } catch (error) {
+        } catch (_error) {
             Alert.alert('Error', 'Could not save trigger. Please try again.');
         }
     };
@@ -68,7 +68,7 @@ export const TriggersListScreen = () => {
                     onPress: async () => {
                         try {
                             await removeTrigger(triggerId);
-                        } catch (error) {
+                        } catch (_error) {
                             Alert.alert('Error', 'Could not delete trigger.');
                         }
                     },

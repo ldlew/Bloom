@@ -3,11 +3,15 @@ import { View, Text, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StyleSheet } from 'react-native-unistyles';
 import { useNavigation } from '@react-navigation/native';
-import Slider from '@react-native-community/slider';
 import { BackButton } from '../components/buttons/BackButton';
 import { SproutAvatar } from '../components/sprites/SproutAvatar';
 import { useAppStore } from '../stores/useAppStore';
-import { COLOR_OPTIONS, BODY_OPTIONS, HAT_OPTIONS, getHatComponent } from '../components/constants/sprout.registry';
+import { 
+    COLOR_OPTIONS, 
+    BODY_OPTIONS, 
+    HAT_OPTIONS, 
+    getHatComponent, 
+} from '../components/constants/sprout.registry';
 
 export const SproutAppearanceScreen = () => {
     const navigation = useNavigation();
@@ -16,7 +20,6 @@ export const SproutAppearanceScreen = () => {
     const [selectedColor, setSelectedColor] = useState(selectedSprout?.color ?? '#5BBFBA');
     const [selectedShape, setSelectedShape] = useState(selectedSprout?.shapeId ?? 'rounded');
     const [selectedHat, setSelectedHat] = useState(selectedSprout?.hatId ?? 'leaves');
-    const [scale, setScale] = useState(1);
     const [isSaving, setIsSaving] = useState(false);
 
     if (!selectedSprout) {return null;}
@@ -27,22 +30,22 @@ export const SproutAppearanceScreen = () => {
         selectedHat !== selectedSprout.hatId;
 
 const handleSave = async () => {
-    console.log('handleSave called');
-    console.log('selectedColor:', selectedColor);
-    console.log('selectedShape:', selectedShape);
-    console.log('selectedHat:', selectedHat);
-    console.log('sprout.color:', selectedSprout.color);
-    console.log('sprout.shapeId:', selectedSprout.shapeId);
-    console.log('sprout.hatId:', selectedSprout.hatId);
-    console.log('hasChanges:', hasChanges);
+    console.info('handleSave called');
+    console.info('selectedColor:', selectedColor);
+    console.info('selectedShape:', selectedShape);
+    console.info('selectedHat:', selectedHat);
+    console.info('sprout.color:', selectedSprout.color);
+    console.info('sprout.shapeId:', selectedSprout.shapeId);
+    console.info('sprout.hatId:', selectedSprout.hatId);
+    console.info('hasChanges:', hasChanges);
 
     if (!hasChanges) {
-        console.log('No changes detected, going back');
+        console.info('No changes detected, going back');
         navigation.goBack();
         return;
     }
 
-    console.log('Changes detected, saving...');
+    console.info('Changes detected, saving...');
     setIsSaving(true);
     try {
         await updateAppearance({
@@ -50,7 +53,7 @@ const handleSave = async () => {
             shapeId: selectedShape,
             hatId: selectedHat,
         });
-        console.log('updateAppearance completed');
+        console.info('updateAppearance completed');
         navigation.goBack();
     } catch (error) {
         console.error('Save error:', error);
@@ -79,7 +82,7 @@ const handleSave = async () => {
                             color={selectedColor}
                             shapeId={selectedShape}
                             hatId={selectedHat}
-                            scale={scale}
+                            scale={1} 
                         />
                     </View>
 
@@ -89,27 +92,14 @@ const handleSave = async () => {
                         <TouchableOpacity 
                             style={styles.hatButton}
                             onPress={() => {
-                                const currentIndex = HAT_OPTIONS.findIndex(h => h.id === selectedHat);
+                                const currentIndex = 
+                                    HAT_OPTIONS.findIndex(h => h.id === selectedHat);
                                 const nextIndex = (currentIndex + 1) % HAT_OPTIONS.length;
                                 setSelectedHat(HAT_OPTIONS[nextIndex].id);
                             }}
                         >
                             <CurrentHatIcon width={50} height={40} />
                         </TouchableOpacity>
-
-                        {/* Vertical slider */}
-                        <View style={styles.sliderContainer}>
-                            <Slider
-                                style={styles.slider}
-                                minimumValue={0.6}
-                                maximumValue={1.2}
-                                value={scale}
-                                onValueChange={setScale}
-                                minimumTrackTintColor={selectedColor}
-                                maximumTrackTintColor={selectedColor + '40'}
-                                thumbTintColor="white"
-                            />
-                        </View>
 
                         {/* Shape buttons */}
                         <View style={styles.shapeButtons}>
@@ -206,16 +196,6 @@ const styles = StyleSheet.create((theme) => ({
         borderRadius: theme.radius.lg,
         justifyContent: 'center',
         alignItems: 'center',
-    },
-    sliderContainer: {
-        flex: 1,
-        width: 40,
-        justifyContent: 'center',
-    },
-    slider: {
-        width: 180,
-        height: 40,
-        transform: [{ rotate: '-90deg' }],
     },
     shapeButtons: {
         gap: theme.spacing.sm,

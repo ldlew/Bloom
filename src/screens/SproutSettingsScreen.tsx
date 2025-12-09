@@ -63,7 +63,7 @@ export const SproutSettingsScreen = () => {
                             clearSelectedSprout();
                             await loadSprouts();
                             navigation.navigate('SproutList');
-                        } catch (error) {
+                        } catch (_error) {
                             Alert.alert('Error', 'Failed to delete sprout');
                         }
                     },
