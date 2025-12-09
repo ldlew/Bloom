@@ -1,5 +1,6 @@
 import { Sprout } from '../../../src/domain/models/Sprout'; 
 import { DEFAULT_COLOR, MAX_AFFIRMATIONS, MAX_TRIGGERS } from '../../../src/domain/constants/sprout.constants';
+import fc from 'fast-check';
 
 // Needed for Jest to generate IDs
 jest.mock('expo-crypto', () => ({
@@ -321,6 +322,55 @@ describe('Sprout Domain Entity', () => {
             it('should throw error if trigger ID not found during reorder', () => {
                 expect(() => sprout.reorderTrigger('fake-id', 1)).toThrow('Trigger not found');
             });
+        });
+    });
+
+    describe('Property-Based Robustness (Fast-Check)', () => {
+        it('should handle ANY string input for affirmations without crashing', () => {
+            fc.assert(
+                fc.property(fc.string(), (randomText) => {
+                    const propSprout = Sprout.createNewSprout('prop-user');
+                    propSprout.addAffirmation(randomText);
+                    const added = propSprout.affirmations[0];
+                    expect(added.text).toBe(randomText.trim());
+                    expect(added.id).toBeDefined();
+                }),
+            );
+        });
+
+        it('should handle ANY string input for triggers without crashing', () => {
+            fc.assert(
+                fc.property(fc.string(), (randomText) => {
+                    const propSprout = Sprout.createNewSprout('prop-user');
+                    propSprout.addTrigger(randomText);
+                    const added = propSprout.triggers[0];
+                    expect(added.text).toBe(randomText.trim());
+                }),
+            );
+        });
+
+        it('should preserve item count when reordering affirmations (invariants)', () => {
+            fc.assert(
+                fc.property(
+                    fc.array(fc.string({ minLength: 1 }), { minLength: 2, maxLength: MAX_AFFIRMATIONS }),
+                    fc.nat(), 
+                    fc.nat(), 
+                    (texts, sourceRaw, destRaw) => {
+                        const propSprout = Sprout.createNewSprout('prop-user');
+                        texts.forEach(t => propSprout.addAffirmation(t));
+                        
+                        const count = propSprout.affirmations.length;
+                        const sourceIndex = sourceRaw % count;
+                        const destIndex = destRaw % count;
+                        const idToMove = propSprout.affirmations[sourceIndex].id;
+
+                        propSprout.reorderAffirmation(idToMove, destIndex);
+
+                        expect(propSprout.affirmations.length).toBe(count);
+                        expect(propSprout.affirmations[destIndex].id).toBe(idToMove);
+                    },
+                ),
+            );
         });
     });
 });

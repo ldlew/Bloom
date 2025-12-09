@@ -1,5 +1,10 @@
-import { User } from "../../../src/domain";
-import { AuthProfile } from "../../../src/domain/types/User.types";
+import { User } from '../../../src/domain/models/User';
+import { AuthProfile } from '../../../src/domain/types/User.types';
+import fc from 'fast-check';
+
+jest.mock('expo-crypto', () => ({
+    randomUUID: jest.fn(() => 'mock-uuid'),
+}));
 
 jest.mock('../../../src/domain/models/BaseModel', () => {
     return {
@@ -25,7 +30,7 @@ jest.mock('../../../src/domain/models/BaseModel', () => {
                 this.modified = false;
                 this.lastSyncedAt = date;
             }
-        }
+        },
     };
 });
 
@@ -127,6 +132,55 @@ describe('User Domain Entity', () => {
             user.syncWithProfile(TEST_PROFILE);
 
             expect(user.displayName).toBe('MyNickname');
+        });
+    });
+
+    // --- Fast-Check Property Testing ---
+    describe('Property-Based Robustness (Fast-Check)', () => {
+        
+        // Property: syncWithProfile should ALWAYS set fields correctly and reset modified state
+        // regardless of what crazy strings (nulls, emojis, massive text) come from Auth provider
+        it('should always correctly apply profile data and reset modified status', () => {
+            fc.assert(
+                fc.property(
+                    fc.string(), // Random firstName
+                    fc.string(), // Random lastName
+                    fc.option(fc.string()), // Random imageUrl (can be null)
+                    (fName, lName, img) => {
+                        const randomProfile = { ...TEST_PROFILE, firstName: fName, lastName: lName, imageUrl: img };
+                        const subject = User.createFromProfile(TEST_PROFILE);
+                        
+                        // Action
+                        subject.syncWithProfile(randomProfile);
+
+                        // Invariant: Fields must match input exactly
+                        expect(subject.firstName).toBe(fName);
+                        expect(subject.lastName).toBe(lName);
+                        expect(subject.imageUrl).toBe(img);
+                        
+                        // Invariant: Must be clean (not modified)
+                        expect((subject as any).modified).toBe(false);
+                    }
+                )
+            );
+        });
+
+        it('should handle any display name input and mark modified', () => {
+            fc.assert(
+                fc.property(
+                    fc.option(fc.string()),
+                    (randomName) => {
+                        const subject = User.createFromProfile(TEST_PROFILE);
+                        
+                        (subject as any).modified = false; 
+
+                        subject.setDisplayName(randomName);
+
+                        expect(subject.displayName).toBe(randomName);
+                        expect((subject as any).modified).toBe(true);
+                    }
+                )
+            );
         });
     });
 });

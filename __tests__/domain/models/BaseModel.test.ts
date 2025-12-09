@@ -1,4 +1,9 @@
 import { BaseModel, BaseModelProps } from '../../../src/domain';
+import fc from 'fast-check';
+
+jest.mock('expo-crypto', () => ({
+    randomUUID: jest.fn(() => 'mock-uuid'),
+}));
 
 // pass initial properties to the basemodel
 class TestImplementation extends BaseModel {
@@ -55,7 +60,7 @@ describe('BaseModel', () => {
         expect(instance.syncStatus).toBe('pending');
     });
 
-    // simulates a tiemstamp that would be return after syncing  
+    // simulates a tiemstamp that would be return after syncing 
     it('updates timestamp and status on sync', () => {
         const serverTime = new Date('2025-11-29T12:35:00Z');
         
@@ -63,5 +68,48 @@ describe('BaseModel', () => {
 
         expect(instance.updatedAt).toEqual(serverTime);
         expect(instance.syncStatus).toBe('synced');
+    });
+
+    describe('Property-Based', () => {
+        it('should always transition to PENDING on modification', () => {
+            fc.assert(
+                fc.property(
+                    fc.date({ min: new Date('2020-01-01'), max: new Date('2100-01-01') }), 
+                    fc.constantFrom('synced', 'pending', 'unsynced'),
+                    (randomDate, initialStatus) => {
+                        const subject = new TestImplementation({
+                            id: 'prop-test-id',
+                            createdAt: randomDate,
+                            updatedAt: randomDate,
+                            syncStatus: initialStatus as any,
+                        });
+
+                        const futureTime = new Date(randomDate.getTime() + 1000);
+                        jest.setSystemTime(futureTime);
+
+                        subject.exposeMarkModified();
+
+                        expect(subject.syncStatus).toBe('pending');
+                        expect(subject.updatedAt).toEqual(futureTime);
+                    },
+                ),
+            );
+        });
+
+        it('should always transition to SYNCED on sync confirmation', () => {
+            fc.assert(
+                fc.property(
+                    fc.date(),
+                    (serverDate) => {
+                        const subject = new TestImplementation(props);
+
+                        subject.exposeMarkSynced(serverDate);
+
+                        expect(subject.syncStatus).toBe('synced');
+                        expect(subject.updatedAt).toEqual(serverDate);
+                    },
+                ),
+            );
+        });
     });
 });
