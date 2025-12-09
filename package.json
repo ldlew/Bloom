@@ -10,6 +10,7 @@
     "web": "expo start --web",
     "test": "jest --watchAll",
     "test:coverage": "jest --coverage",
+    "test:ci": "jest --ci --runInBand --watchAll=false --coverage",
     "lint": "eslint src __tests__",
     "lint:fix": "eslint src __tests__ --fix",
     "docker:up": "docker compose up --build",
