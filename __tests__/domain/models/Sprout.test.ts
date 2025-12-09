@@ -1,3 +1,11 @@
+import { Sprout } from '../../../src/domain/models/Sprout'; 
+import { DEFAULT_COLOR, MAX_AFFIRMATIONS, MAX_TRIGGERS } from '../../../src/domain/constants/sprout.constants';
+
+// Needed for Jest to generate IDs
+jest.mock('expo-crypto', () => ({
+    randomUUID: jest.fn(() => Math.random().toString()),
+}));
+
 jest.mock('../../../src/domain/models/BaseModel', () => {
     return {
         BaseModel: class MockBaseModel {
@@ -15,12 +23,9 @@ jest.mock('../../../src/domain/models/BaseModel', () => {
             public resetModified() {
                 this.modified = false;
             }
-        }
+        },
     };
 });
-
-import { Sprout } from "../../../src/domain"; 
-import { DEFAULT_COLOR, MAX_AFFIRMATIONS } from "../../../src/domain/constants/sprout.constants";
 
 describe('Sprout Domain Entity', () => {
     //connects sprouts to certain users
@@ -38,9 +43,10 @@ describe('Sprout Domain Entity', () => {
         it('should create a new sprout with default values', () => {
             expect(sprout.userId).toBe(TEST_USER_ID);
             expect(sprout.color).toBe(DEFAULT_COLOR);
-            expect(sprout.shapeId).toBe('default');
-            expect(sprout.hatId).toBe('default');
+            expect(sprout.shapeId).toBe('rounded');
+            expect(sprout.hatId).toBe('leaves');
             expect(sprout.affirmations).toEqual([]);
+            expect(sprout.triggers).toEqual([]);
         });
 
         it('should rehydrate from persistence correctly', () => {
@@ -52,17 +58,22 @@ describe('Sprout Domain Entity', () => {
                 hatId: 'cowboy',
                 syncStatus: 'synced',
                 createdAt: new Date(),
-                updatedAt: new Date()
+                updatedAt: new Date(),
             };
             
             const existingAffirmations = [
-                { id: '1', text: 'Existing', position: 0 }
+                { id: '1', text: 'Existing Aff', position: 0 },
+            ];
+            const existingTriggers = [
+                { id: 't1', text: 'Existing Trig', position: 0 },
             ];
 
-            const loadedSprout = Sprout.createFromPersistence(props, existingAffirmations);
+            const loadedSprout = Sprout.createFromPersistence(props, existingAffirmations as any, existingTriggers as any);
 
             expect(loadedSprout.userId).toBe('user-999');
             expect(loadedSprout.color).toBe('#FF0000');
+            expect(loadedSprout.affirmations[0].text).toBe('Existing Aff');
+            expect(loadedSprout.triggers[0].text).toBe('Existing Trig');
         });
     });
 
@@ -111,7 +122,7 @@ describe('Sprout Domain Entity', () => {
 
             expect(() => {
                 sprout.addAffirmation('One too many');
-            }).toThrow("Maximum # of affirmations reached");
+            }).toThrow('Maximum # of affirmations reached');
         });
 
         //test that affirmation removal is being done correctly 
@@ -199,6 +210,117 @@ describe('Sprout Domain Entity', () => {
 
         it('should throw error if affirmation ID not found during reorder', () => {
             expect(() => sprout.reorderAffirmation('fake-id', 1)).toThrow('Affirmation not found');
+        });
+    });
+
+    //Trigger Management, test CRUD operations
+    describe('Trigger Management', () => {
+        it('should add a trigger', () => {
+            sprout.addTrigger('I feel anxious');
+            
+            expect(sprout.triggers[0].text).toBe('I feel anxious');
+            expect(sprout.triggers[0].position).toBe(0);
+            expect(sprout.triggers[0].id).toBeDefined();
+            expect((sprout as any).modified).toBe(true);
+        });
+
+        it('should trim whitespace when adding triggers', () => {
+            sprout.addTrigger('   Panic   ');
+            expect(sprout.triggers[0].text).toBe('Panic');
+        });
+
+        //throws an error if two many triggers are added
+        it('should throw error when exceeding MAX_TRIGGERS', () => {
+            for (let i = 0; i < MAX_TRIGGERS; i++) {
+                sprout.addTrigger(`Trigger ${i}`);
+            }
+
+            expect(() => {
+                sprout.addTrigger('One too many');
+            }).toThrow('Maximum # of triggers reached');
+        });
+
+        //test that trigger removal is being done correctly
+        it('should remove a trigger and reindex', () => {
+            sprout.addTrigger('T1');
+            sprout.addTrigger('T2');
+            sprout.addTrigger('T3');
+
+            const secondId = sprout.triggers[1].id;
+            
+            sprout.removeTrigger(secondId);
+
+            expect(sprout.triggers[0].text).toBe('T1');
+            expect(sprout.triggers[1].text).toBe('T3');
+            
+            expect(sprout.triggers[0].position).toBe(0);
+            expect(sprout.triggers[1].position).toBe(1);
+            expect((sprout as any).modified).toBe(true);
+        });
+
+        it('should throw error when removing non-existent trigger', () => {
+            expect(() => {
+                sprout.removeTrigger('fake-id');
+            }).toThrow('Trigger not found');
+        });
+
+        //test that updating a trigger is done correctly
+        it('should update trigger text', () => {
+            sprout.addTrigger('Original');
+            const id = sprout.triggers[0].id;
+
+            sprout.updateTriggerText(id, 'Updated');
+
+            expect(sprout.triggers[0].text).toBe('Updated');
+            expect((sprout as any).modified).toBe(true);
+        });
+
+        it('should throw error when updating non-existent trigger', () => {
+            expect(() => {
+                sprout.updateTriggerText('fake-id', 'New Text');
+            }).toThrow('Trigger not found');
+        });
+
+        //Reordering Logic for Triggers
+        describe('Reordering Logic', () => {
+            //creats example triggers
+            beforeEach(() => {
+                sprout.addTrigger('T_A');
+                sprout.addTrigger('T_B');
+                sprout.addTrigger('T_C');
+                (sprout as any).modified = false;
+            });
+
+            //reorder triggers should be (T_B, T_C, T_A)
+            it('should move an item down the list (0 -> 2)', () => {
+                const idToMove = sprout.triggers[0].id;
+                sprout.reorderTrigger(idToMove, 2);
+                
+                const texts = sprout.triggers.map(t => t.text);
+                expect(texts).toEqual(['T_B', 'T_C', 'T_A']);
+                
+                expect(sprout.triggers[0].position).toBe(0);
+                expect((sprout as any).modified).toBe(true);
+            });
+
+            //reorder triggers should be (T_C, T_A, T_B)
+            it('should move an item up the list (2 -> 0)', () => {
+                const idToMove = sprout.triggers[2].id;
+                sprout.reorderTrigger(idToMove, 0);
+                
+                const texts = sprout.triggers.map(t => t.text);
+                expect(texts).toEqual(['T_C', 'T_A', 'T_B']);
+            });
+
+            it('should throw error for invalid indices', () => {
+                const id = sprout.triggers[0].id;
+                expect(() => sprout.reorderTrigger(id, -1)).toThrow('Invalid position');
+                expect(() => sprout.reorderTrigger(id, 99)).toThrow('Invalid position');
+            });
+
+            it('should throw error if trigger ID not found during reorder', () => {
+                expect(() => sprout.reorderTrigger('fake-id', 1)).toThrow('Trigger not found');
+            });
         });
     });
 });

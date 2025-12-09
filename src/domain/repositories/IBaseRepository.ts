@@ -1,4 +1,4 @@
-import { BaseModel } from "../models/BaseModel";
+import { BaseModel } from '../models/BaseModel';
 
 // Standard CRUD operations, every entity must implement these methods.
 export interface IBaseRepository<T extends BaseModel> {

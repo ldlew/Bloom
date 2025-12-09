@@ -1,1 +1,1 @@
-export const DATABASE_NAME = 'bloom.db'
+export const DATABASE_NAME = 'bloom.db';

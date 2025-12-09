@@ -1,4 +1,4 @@
-import { SyncStatus, BaseModelProps  } from "../types/Common.types";
+import { SyncStatus, BaseModelProps  } from '../types/Common.types';
 
 export abstract class BaseModel {
     private readonly _id: string;

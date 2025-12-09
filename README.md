@@ -1,2 +1,4 @@
 # Bloom - OOP Final Project
 Team Members: Lauren Lewis, Ashley Velasquez
+
+### Python Requirements (Translated)

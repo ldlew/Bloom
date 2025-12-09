@@ -4,11 +4,18 @@ export interface RunResult {
     changes: number;
 }
 
+// Valid types for SQLite parameters
+export type SqlValue = string | number | null | boolean | Uint8Array;
+
 // Contract for Sqlite Adapter. 
 export interface ISqliteAdapter {
-    getFirstAsync<T = any>(sql: string, params?: any[]): Promise<T | null>;
-    getAllAsync<T = any>(sql: string, params?: any[]): Promise<T[]>;
-    runAsync(sql: string, params?: any[]): Promise<RunResult>;
+    getFirstAsync<T = unknown>(sql: string, params?: SqlValue[]): Promise<T | null>;
+    
+    getAllAsync<T = unknown>(sql: string, params?: SqlValue[]): Promise<T[]>;
+    
+    runAsync(sql: string, params?: SqlValue[]): Promise<RunResult>;
+    
     execAsync(sql: string): Promise<void>;
+    
     withExclusiveTransactionAsync<T>(callback: (txn: ISqliteAdapter) => Promise<T>): Promise<T>;
 }

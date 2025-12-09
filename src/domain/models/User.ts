@@ -1,5 +1,5 @@
-import { BaseModel } from "./BaseModel";
-import { UserProps, AuthProfile } from "../types/User.types";
+import { BaseModel } from './BaseModel';
+import { UserProps, AuthProfile } from '../types/User.types';
 
 export class User extends BaseModel {
     private _firstName: string | null;
@@ -23,7 +23,7 @@ export class User extends BaseModel {
     public get email(): string | null { return this._email; }
     public get imageUrl(): string | null { return this._imageUrl; }
 
-    static createFromProfile(profile: AuthProfile): User {
+    public static createFromProfile(profile: AuthProfile): User {
         return new User({
             ...profile,
             displayName: null,
@@ -33,7 +33,7 @@ export class User extends BaseModel {
         });
     }
 
-    static createFromPersistence(props: UserProps): User {
+    public static createFromPersistence(props: UserProps): User {
         return new User(props);
     }
 

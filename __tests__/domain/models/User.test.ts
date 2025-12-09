@@ -1,3 +1,6 @@
+import { User } from "../../../src/domain";
+import { AuthProfile } from "../../../src/domain/types/User.types";
+
 jest.mock('../../../src/domain/models/BaseModel', () => {
     return {
         BaseModel: class MockBaseModel {
@@ -25,9 +28,6 @@ jest.mock('../../../src/domain/models/BaseModel', () => {
         }
     };
 });
-
-import { User } from "../../../src/domain";
-import { AuthProfile } from "../../../src/domain/types/User.types";
 
 describe('User Domain Entity', () => {
     const TEST_PROFILE: AuthProfile = {

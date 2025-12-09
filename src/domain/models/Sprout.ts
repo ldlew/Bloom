@@ -1,7 +1,7 @@
-import { BaseModel } from "./BaseModel"; 
-import { SproutProps, Affirmation, Trigger } from "../types/Sprout.types";
-import { DEFAULT_COLOR, MAX_AFFIRMATIONS, MAX_TRIGGERS } from "../constants/sprout.constants";
-import { v4 as uuidv4 } from 'uuid';
+import { BaseModel } from './BaseModel'; 
+import { SproutProps, Affirmation, Trigger } from '../types/Sprout.types';
+import { DEFAULT_COLOR, MAX_AFFIRMATIONS, MAX_TRIGGERS } from '../constants/sprout.constants';
+import * as Crypto from 'expo-crypto';
 
 export class Sprout extends BaseModel {
     private _userId: string;
@@ -33,9 +33,9 @@ export class Sprout extends BaseModel {
     public get triggers(): readonly Trigger[] { return this._triggers; }
 
     // "Brand new" factory method
-    static createNewSprout(userId: string): Sprout {
+    public static createNewSprout(userId: string): Sprout {
         return new Sprout({
-            id: uuidv4(),
+            id: Crypto.randomUUID(),
             userId: userId,
             color: DEFAULT_COLOR,
             shapeId: 'rounded',
@@ -47,7 +47,11 @@ export class Sprout extends BaseModel {
     }
 
     // Factory method to rehydrate existing sprout from database.
-    static createFromPersistence(props: SproutProps, affirmations: Affirmation[], triggers: Trigger[]): Sprout {
+    public static createFromPersistence(
+        props: SproutProps, 
+        affirmations: Affirmation[], 
+        triggers: Trigger[],
+    ): Sprout {
         return new Sprout(props, affirmations, triggers);
     }
 
@@ -71,11 +75,11 @@ export class Sprout extends BaseModel {
 
     public addAffirmation(text: string): void {
         if (this._affirmations.length >= MAX_AFFIRMATIONS) {
-            throw new Error("Maximum # of affirmations reached");
+            throw new Error('Maximum # of affirmations reached');
         }
 
         const newAffirmation: Affirmation = {
-            id: uuidv4(),
+            id: Crypto.randomUUID(),
             text: text.trim(),
             position: this._affirmations.length,
         };
@@ -134,11 +138,11 @@ export class Sprout extends BaseModel {
 
     public addTrigger(text: string): void {
         if (this._triggers.length >= MAX_TRIGGERS) {
-            throw new Error("Maximum # of triggers reached");
+            throw new Error('Maximum # of triggers reached');
         }
 
         const newTrigger: Trigger = {
-            id: uuidv4(),
+            id: Crypto.randomUUID(),
             text: text.trim(),
             position: this._triggers.length,
         };

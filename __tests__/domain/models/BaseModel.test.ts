@@ -1,11 +1,8 @@
-import { BaseModel } from "../../../src/domain";
-import { BaseModelProps } from "../../../src/domain"; 
+import { BaseModel, BaseModelProps } from '../../../src/domain';
 
-//pass initial properties to the basemodel
+// pass initial properties to the basemodel
 class TestImplementation extends BaseModel {
-    constructor(props: BaseModelProps) {
-        super(props);
-    }
+    // Constructor removed (it is automatic in derived classes)
 
     public exposeMarkModified(): void {
         this.markModified();
@@ -18,29 +15,29 @@ class TestImplementation extends BaseModel {
 
 describe('BaseModel', () => {
     let instance: TestImplementation;
-    //a set timestamp for reference during test 
+    // a set timestamp for reference during test 
     const today = new Date('2025-11-29T12:00:00Z');
     
     const props: BaseModelProps = {
         id: '9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d',
         createdAt: today,
         updatedAt: today,
-        syncStatus: 'synced'
+        syncStatus: 'synced',
     };
 
-    //set the system clocks and get a new instance before each test 
+    // set the system clocks and get a new instance before each test 
     beforeEach(() => {
         jest.useFakeTimers();
         jest.setSystemTime(today);
         instance = new TestImplementation(props);
     });
 
-    //restore new timers after each test 
+    // restore new timers after each test 
     afterEach(() => {
         jest.useRealTimers();
     });
 
-    //ensures basemodel assigned its inital properties correctly 
+    // ensures basemodel assigned its inital properties correctly 
     it('initializes properties correctly', () => {
         expect(instance.id).toBe(props.id);
         expect(instance.createdAt).toEqual(props.createdAt);
@@ -58,7 +55,7 @@ describe('BaseModel', () => {
         expect(instance.syncStatus).toBe('pending');
     });
 
-    //simulates a tiemstamp that would be return after syncing  
+    // simulates a tiemstamp that would be return after syncing  
     it('updates timestamp and status on sync', () => {
         const serverTime = new Date('2025-11-29T12:35:00Z');
         
